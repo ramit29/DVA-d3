@@ -1,0 +1,4 @@
+a2.The Wins + Nominations vs Ratings graph(1st graph) is better at separating the data than the budget vs ratings graph(2nd graph). In the first graph the data has clustered in such a way, that to the naked eye a linear functions seems enough to capture the difference between good and bad rating, but no such clustering of data is visible in the second graph.
+
+c.Log scaled axis are better when the values in a dataset have a very big range, taking the logarithm of the values will help with better visualization than a linear scale of those values.
+  Square-root scaled axis is good at de-cluttering data and providing an even spread of the data as it scales quickly even for a small difference in values, it is also good for representing values with a big range difference.

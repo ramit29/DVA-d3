@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.counties {
+  fill: white;
+}
+
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+}
+.d3-tip.n:after {
+  margin: -10px 0 10 0;
+  top: 25%;
+}
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 2px;
+}
+</style>
+<svg width="1060" height="950"></svg>
+<script src="../lib/d3.v5.min.js"></script>
+<script src="../lib/d3-scale-chromatic.v1.min.js"></script>
+<script src="../lib/topojson.v2.min.js"></script>
+<script src="../lib/d3-tip.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+
+
+var path = d3.geoPath();
+
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset(function() {
+    return [1,1];
+  })
+  .html(function(d) {
+    return d;
+  });
+
+var x = d3.scaleLinear()
+    .domain([1, 20])
+    .rangeRound([60, 300]);
+
+var color = d3.scaleThreshold()
+    .domain(d3.range(2, 19,2))
+    .range(d3.schemeYlGnBu[9]);
+
+var g = svg.append("g")
+    .attr("class", "key")
+    .attr("transform", "translate(970,-10)");
+
+g.selectAll("rect")
+  .data(color.range().map(function(d) {
+      d = color.invertExtent(d);
+      if (d[0] == null) d[0] = x.domain()[0];
+      if (d[1] == null) d[1] = x.domain()[1];
+      return d;
+    }))
+  .enter().append("rect")
+    .attr("width", 20)
+    .attr("x", -11)
+    .attr("y", function(d) { return x(d[0]); })
+    .attr("height", function(d) { return x(d[1]) - x(d[0]); })
+    .attr("fill", function(d) { return color(d[0]); })
+    .attr("transform", "rotate(0)");
+    g.append("text")
+        .attr("class", "caption")
+        .attr("x", x.range()[0] - 70)
+        .attr("y",40)
+        .attr("fill", "#000")
+        .attr("text-anchor", "start")
+        .attr("font-weight", "bold")
+        .text("Poverty Rate");
+
+    g.call(d3.axisRight(x)
+        .tickSize(13)
+        .tickFormat(function(x, i) { return  i ? x : x + "%"; })
+        .tickValues(color.domain()))
+      .select(".domain")
+        .remove();
+
+
+
+
+
+var promises = [d3.json("us.json"),d3.csv("county_poverty.csv"),d3.csv("county_detail.csv")]
+function ready(us, county_poverty,county_detail) {
+  var poverty={}
+  var detail={}
+  county_poverty.forEach(function(d){
+    poverty[d.CensusId]=[d.State, d.County, d.Poverty];
+  });
+  county_detail.forEach(function(d){
+    detail[d.CensusId]=[d.IncomePerCap, d.TotalPop];
+  })
+
+
+  svg.call(tip);
+  svg.append("g")
+      .attr("class", "counties")
+    .selectAll("path")
+    .data(topojson.feature(us, us.objects.counties).features)
+    .enter().append("path")
+      .attr("fill", function(d) { return color(poverty[d.id][2]); })
+
+      .attr("d", path)
+      .on("mousemove",function (d) {
+        var print = "State :" + poverty[d.id][0]+"</br>" + "County:" + poverty[d.id][1] + "</br>" + "Poverty rate:" + poverty[d.id][2] + "%" + "</br>" + "Total Population:" + detail[d.id][1] + "</br>"+ "Income per capita:" + detail[d.id][0];
+        tip.show(print);
+        tip.direction('e')
+
+    })
+      .on('mouseout', tip.hide);
+  svg.append("path")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "states")
+      .attr("d", path);
+
+}
+
+Promise.all(promises).then(function(values) { ready(values[0],values[1],values[2]);});
+</script>

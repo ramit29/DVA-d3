@@ -1,0 +1,29 @@
+Ease to develop for developers:
+
+      R(ggplot2): Moderately developer friendly. Once a devloper knows how to use R, a wide range of plots can be plotted for different types of data.
+      Tableau: Very developer friendly, quick to use and easy to generate fast and eye-catching visualizations.
+      D3.js : Not developer friendly. Has a very steep learning curve.
+
+Ease to maintain the visualization:
+
+      R(ggplot2): An R function can be written, where even if the data(values) changes and the function can be used to generate a visualization quickly, but dependencies are limited to a particular version of R.
+      Tableau: Each time the data changes, the user will have to run through the entire setup, again.
+      d3.js: Functions can be written in d3, where if the data values or dimensions change, a visualization can be generated quickly, but changes in version of d3 will will render the program from a previous version helpless(d3 v4 to d3 v5).
+
+Usability of visualization developed for end users:
+
+      R(ggplot2): Good looking visualizations can be made, but limited to no capability towards making interactive visualization for users, most visualizations are static.
+      Tableau: Interactive visualizations can be made.
+      d3.js: Highly interactive and extremely dynamic visualizations can be made, with the end user capable of accessing a wide array of options for the visualizations.
+
+Scalabilty of visualization to large datasets:
+
+    R(ggplot2): R reads all the data into memory, which can be detrimental when loading in large datasets and depending on the wrapper functions written for the other tools.
+    Tableau: Tableau scales very poorly as the size of the data increases, and the use of tableau for visualizing very large datasets is discouraged.
+    d3.js: d3 scales better to large data when compared to R(gglot2) or tableau. d3.js can be used in conjunction with web-gl based technologies, making it usable with GPUs.
+
+System requirements to run the visualization:
+
+    R(ggplot2): R can be run directly from the terminal. A better method of running most applications is using RStudio. Supported by all OS
+    Tableau: Tableau is a paid software and requires licensing to run, it runs as a downloaded application.
+    d3.js: Only the library is required to be included either through inline link or js script. Some visualizations can only be seen using  Mozilla firefox. Supported by all OS.

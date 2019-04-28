@@ -1,0 +1,6 @@
+.bar rect {
+    fill: red;
+}
+.axis path {
+    display: none;
+}

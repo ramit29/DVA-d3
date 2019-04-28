@@ -1,0 +1,645 @@
+<html lang = "en">
+	<head>
+		<meta charset = "utf-8">
+		<style type = "text/css">
+    div.main {
+        margin: auto;
+        width: 1000px;
+    }
+    .main h2 {
+        text-align: center;
+        margin-top: 500px;
+        font-size: 30px;
+    }
+
+    .pagebreak { page-break-before: always; }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+    }
+    </style>
+
+		<script src="../lib/d3.v5.min.js"></script>
+	</head>
+
+	<body>
+		<script type = "text/javascript">
+
+
+		//width and height
+    var margin = {top: 220, right: 150, bottom: 230, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 900 - margin.top - margin.bottom;
+
+
+
+		var padding = 40;
+
+
+
+
+
+
+		/*
+		var dataset;
+		//load data
+		d3.csv('weather.csv', function(d) {
+			//data.forEach(function(d) {
+			//dataset.push(d.precipitation);
+			return {
+				//max: d.Maximum,
+				//min: d.Minimum,
+				//month: d.Month,
+				precipitation: d.Precipitation
+				//speed: d.Speed,
+				//state: d.State,
+				//year: d.Year
+			};
+		}, function(d) {
+			dataset.push(d.precipitation);
+		});
+
+
+
+		var temp;
+		var string;
+		for(var i = 0; i < numBars; i++) {
+			string = dataset.get(i);
+			state = states.get(i);
+			temp = {state: string};
+			dataset.push(temp);
+		}*/
+
+		//var dataset = data.slice(0, numBars + 1);
+		//max vs min
+    var dataset=[];
+		d3.csv("movies.csv").then(function(data){
+
+    dataset = data;
+
+		/*
+		dataset = [{max: 46, min: 32},
+					{max: 47, min: 31},
+					{max: 51, min: 41},
+					{max: 52, min: 38},
+					{max: 38, min: 29}];
+					*/
+
+		//scale function
+
+
+    //set color scale
+		var xScale = d3.scaleLinear()
+			//.domain(["Alabama","Alaska","Arizona","Arkansas","California"])
+			.domain([2.0, 9.0])
+			//.range([padding, w-padding * 2]);
+			.range([padding, width - padding * 2]);
+
+		var yScale = d3.scaleLinear()
+		.range([height - padding, padding])
+			.domain([0, 280])
+			//.range([padding, w-padding * 2]);
+			;
+
+		var xAxis = d3.axisBottom().scale(xScale).ticks(20);
+
+		var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+
+
+
+		//create svg element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g")
+					.attr("transform", "translate("+margin.left+","+margin.top + ")");
+
+		var symbol = d3.symbol();
+
+
+					var dots = svg.selectAll(".dots")
+						.data(data)
+						.enter()
+						.append("path");
+
+						var color = d3.scaleOrdinal()
+				    .domain(["0", "1"])
+				    .range(["red","blue"]);
+
+					dots.attr("d", symbol.type(function(d){if(d.IsGoodRating == 0){ return d3.symbolCircle} else if (d.IsGoodRating == 1){ return d3.symbolCross} }))
+						.attr('stroke',function(d){ return color(d.IsGoodRating); })
+						.attr('stroke-width',0.9)
+						.attr('transform',function(d){ return "translate("+xScale(d.Rating)+","+yScale(d.WinsNoms)+")"; })
+
+						.attr("fill", "white");
+
+
+
+		//x axis
+		svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + (height- padding) + ")")
+			.call(xAxis);
+
+
+		//y axis
+		svg.append("g")
+			.attr("class", "y axis")
+			.attr("transform", "translate(" + padding + ", 0)")
+			.call(yAxis);
+
+			svg.append('text')
+			.attr('x', 110)
+			.attr('y', 50)
+			.attr('class', 'label')
+			.attr("transform", "translate("+ (padding/4) +","+(height/2)+")rotate(-90)")
+			.text('Wins+Noms');
+
+			svg.append('text')
+			.attr('x', 650)
+			.attr('y', 440)
+			.attr('class', 'label')
+			.text('Rating');
+
+			svg.append("text")
+	    .attr("x", width / 2 )
+	    .attr("y", 20)
+	    .style("text-anchor", "middle")
+	    .text("Wins+Nominations vs. Rating")
+
+
+			var legend = svg.selectAll(".legend")
+					.data(color.domain())
+					.enter().append("g")
+					.attr("class", "legend")
+					.attr("transform", function(d, i){return "translate(0," + i * 30 + ")";});
+
+			legend.append("text")
+					.attr("x", width+40)
+					.attr("y", 0)
+					.attr("dy", ".35em")
+					.attr("font-size", "15px")
+					.style("text-anchor", "end")
+					.text(function(d) {
+							if(d=="1")
+									return "good rating";
+							else return "bad rating";
+					});
+
+			legend.append("path")
+							.attr("d",symbol.type(function(d){if(d == 0){ return d3.symbolCircle} else if (d == 1){ return d3.symbolCross} }))
+							.attr("transform", "translate("+(width-38)+", 0)")
+							.style("stroke", color)
+							.style("fill","white");
+
+			var xScale = d3.scaleLinear()
+				//.domain(["Alabama","Alaska","Arizona","Arkansas","California"])
+				.domain([2.0, 9.0])
+				//.range([padding, w-padding * 2]);
+				.range([padding, width - padding * 2]);
+
+			var yScale = d3.scaleLinear()
+			.range([height - padding, padding])
+				.domain([0, 200000000])
+				//.range([padding, w-padding * 2]);
+				;
+
+			var xAxis = d3.axisBottom().scale(xScale).ticks(20);
+
+			var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+
+
+
+			//create svg element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", width + margin.left + margin.right)
+						.attr("height", height + margin.top + margin.bottom)
+						.append("g")
+						.attr("transform", "translate("+margin.left+","+margin.top + ")");
+
+			var symbol = d3.symbol();
+
+
+						var dots = svg.selectAll(".dots")
+							.data(data)
+							.enter()
+							.append("path");
+
+							var color = d3.scaleOrdinal()
+							.domain(["0", "1"])
+							.range(["red","blue"]);
+
+						dots.attr("d", symbol.type(function(d){if(d.IsGoodRating == 0){ return d3.symbolCircle} else if (d.IsGoodRating == 1){ return d3.symbolCross} }))
+							.attr('fill', "red")
+							.attr('stroke',function(d){ return color(d.IsGoodRating); })
+							.attr('stroke-width',0.9)
+							.attr('transform',function(d){ return "translate("+xScale(d.Rating)+","+yScale(d.Budget)+")"; })
+
+							.attr("fill", "white");
+
+
+
+			//x axis
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + (height- padding) + ")")
+				.call(xAxis);
+
+
+			//y axis
+			svg.append("g")
+				.attr("class", "y axis")
+				.attr("transform", "translate(" + padding + ", 0)")
+				.call(yAxis);
+
+				svg.append('text')
+				.attr('x', 130)
+				.attr('y', 50)
+				.attr('class', 'label')
+				.attr("transform", "translate("+ (padding/4) +","+(height/2)+")rotate(-90)")
+				.text('Budget');
+
+				svg.append('text')
+				.attr('x', 650)
+				.attr('y', 440)
+				.attr('class', 'label')
+				.text('Rating');
+
+				svg.append("text")
+				.attr("x", width / 2 )
+				.attr("y", 20)
+				.style("text-anchor", "middle")
+				.text("Budget vs. Rating")
+				var legend = svg.selectAll(".legend")
+						.data(color.domain())
+						.enter().append("g")
+						.attr("class", "legend")
+						.attr("transform", function(d, i){return "translate(0," + i * 30 + ")";});
+
+				legend.append("text")
+						.attr("x", width+40)
+						.attr("y", 0)
+						.attr("dy", ".35em")
+						.attr("font-size", "15px")
+						.style("text-anchor", "end")
+						.text(function(d) {
+								if(d=="1")
+										return "good rating";
+								else return "bad rating";
+						});
+
+				legend.append("path")
+								.attr("d",symbol.type(function(d){if(d == 0){ return d3.symbolCircle} else if (d == 1){ return d3.symbolCross} }))
+								.attr("transform", "translate("+(width-38)+", 0)")
+								.style("stroke", color)
+								.style("fill","white");
+
+
+
+
+
+
+
+				var xScale = d3.scaleLinear()
+					//.domain(["Alabama","Alaska","Arizona","Arkansas","California"])
+					.domain([2.0, 9.0])
+					//.range([padding, w-padding * 2]);
+					.range([padding, width - padding * 2]);
+
+				var yScale = d3.scaleLinear()
+				.range([height - padding, padding])
+					.domain([0, 1000000])
+					//.range([padding, w-padding * 2]);
+					;
+
+				var xAxis = d3.axisBottom().scale(xScale).ticks(20);
+
+				var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+
+
+
+				//create svg element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", width + margin.left + margin.right)
+							.attr("height", height + margin.top + margin.bottom)
+							.append("g")
+							.attr("transform", "translate("+margin.left+","+margin.top + ")");
+
+				var symbol = d3.symbol()
+												.size( function(d) { return (Math.log(d.WinsNoms) ** 3.5) * 1.2});
+
+
+							var dots = svg.selectAll(".dots")
+								.data(data)
+								.enter()
+								.append("path");
+
+								var color = d3.scaleOrdinal()
+								.domain(["0", "1"])
+								.range(["red","blue"]);
+
+							dots.attr("d", symbol.type(function(d){if(d.IsGoodRating == 0){ return d3.symbolCircle} else if (d.IsGoodRating == 1){ return d3.symbolCross} }))
+								.attr('fill', "red")
+								.attr('stroke',function(d){ return color(d.IsGoodRating); })
+								.attr('stroke-width',0.9)
+								.attr('transform',function(d){ return "translate("+xScale(d.Rating)+","+yScale(d.Votes)+")"; })
+								.attr("fill", "white")
+								;
+
+
+
+				//x axis
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + (height- padding) + ")")
+					.call(xAxis);
+
+
+				//y axis
+				svg.append("g")
+					.attr("class", "y axis")
+					.attr("transform", "translate(" + padding + ", 0)")
+					.call(yAxis);
+
+					svg.append('text')
+					.attr('x', 130)
+					.attr('y', 50)
+					.attr('class', 'label')
+					.attr("transform", "translate("+ (padding/4) +","+(height/2)+")rotate(-90)")
+					.text('Votes');
+
+					svg.append('text')
+					.attr('x', 650)
+					.attr('y', 440)
+					.attr('class', 'label')
+					.text('Rating');
+
+					svg.append("text")
+					.attr("x", width / 2 )
+					.attr("y", 20)
+					.style("text-anchor", "middle")
+					.text("Votes vs. Rating sized by Wins+Nominations")
+
+					var legend = svg.selectAll(".legend")
+							.data(color.domain())
+							.enter().append("g")
+							.attr("class", "legend")
+							.attr("transform", function(d, i){return "translate(0," + i * 30 + ")";});
+
+					legend.append("text")
+							.attr("x", width+40)
+							.attr("y", 0)
+							.attr("dy", ".35em")
+							.attr("font-size", "15px")
+							.style("text-anchor", "end")
+							.text(function(d) {
+									if(d=="1")
+											return "good rating";
+									else return "bad rating";
+							});
+
+					legend.append("path")
+									.attr("d",symbol.type(function(d){if(d == 0){ return d3.symbolCircle} else if (d == 1){ return d3.symbolCross} }))
+									.attr("transform", "translate("+(width+138)+", 0)")
+									.style("stroke", color)
+									.style("fill","white");
+
+
+
+					var xScale = d3.scaleLinear()
+
+						.domain([2.0, 9.0])
+
+						.range([padding, width - padding * 2]);
+
+					var yScale = d3.scaleSqrt()
+					.range([height - padding, padding])
+						.domain([0, 280])
+						//.range([padding, w-padding * 2]);
+						;
+
+					var xAxis = d3.axisBottom().scale(xScale).ticks(20);
+
+					var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+
+
+
+					//create svg element
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", width + margin.left + margin.right)
+								.attr("height", height + margin.top + margin.bottom)
+								.append("g")
+								.attr("transform", "translate("+margin.left+","+margin.top + ")");
+
+					var symbol = d3.symbol();
+
+
+								var dots = svg.selectAll(".dots")
+									.data(data)
+									.enter()
+									.append("path");
+
+									var color = d3.scaleOrdinal()
+									.domain(["0", "1"])
+									.range(["red","blue"]);
+
+								dots.attr("d", symbol.type(function(d){if(d.IsGoodRating == 0){ return d3.symbolCircle} else if (d.IsGoodRating == 1){ return d3.symbolCross} }))
+									.attr('fill', "red")
+									.attr('stroke',function(d){ return color(d.IsGoodRating); })
+									.attr('stroke-width',0.9)
+									.attr('transform',function(d){ return "translate("+xScale(d.Rating)+","+yScale(d.WinsNoms)+")"; })
+
+									.attr("fill", "white");
+
+
+
+					//x axis
+					svg.append("g")
+						.attr("class", "x axis")
+						.attr("transform", "translate(0," + (height- padding) + ")")
+						.call(xAxis);
+
+
+					//y axis
+					svg.append("g")
+						.attr("class", "y axis")
+						.attr("transform", "translate(" + padding + ", 0)")
+						.call(yAxis);
+
+						svg.append('text')
+						.attr('x', 110)
+						.attr('y', 50)
+						.attr('class', 'label')
+						.attr("transform", "translate("+ (padding/4) +","+(height/2)+")rotate(-90)")
+						.text('Wins+Noms');
+
+						svg.append('text')
+						.attr('x', 650)
+						.attr('y', 440)
+						.attr('class', 'label')
+						.text('Rating');
+
+						svg.append("text")
+						.attr("x", width / 2 )
+						.attr("y", 20)
+						.style("text-anchor", "middle")
+						.text("Wins+Nominations (square-root-scaled) vs. Rating")
+
+						var legend = svg.selectAll(".legend")
+								.data(color.domain())
+								.enter().append("g")
+								.attr("class", "legend")
+								.attr("transform", function(d, i){return "translate(0," + i * 30 + ")";});
+
+						legend.append("text")
+								.attr("x", width+40)
+								.attr("y", 0)
+								.attr("dy", ".35em")
+								.attr("font-size", "15px")
+								.style("text-anchor", "end")
+								.text(function(d) {
+										if(d=="1")
+												return "good rating";
+										else return "bad rating";
+								});
+
+						legend.append("path")
+										.attr("d",symbol.type(function(d){if(d == 0){ return d3.symbolCircle} else if (d == 1){ return d3.symbolCross} }))
+										.attr("transform", "translate("+(width-38)+", 0)")
+										.style("stroke", color)
+										.style("fill","white");
+
+
+
+						var xScale = d3.scaleLinear()
+							//.domain(["Alabama","Alaska","Arizona","Arkansas","California"])
+							.domain([2.0, 9.0])
+							//.range([padding, w-padding * 2]);
+							.range([padding, width - padding * 2]);
+
+						var yScale = d3.scaleLog()
+						.range([height - padding, padding])
+							.domain([1, 1000])
+							.clamp(true)
+							//.range([padding, w-padding * 2]);
+							;
+
+						var xAxis = d3.axisBottom().scale(xScale).ticks(20);
+
+						var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+
+
+
+						//create svg element
+						var svg = d3.select("body")
+									.append("svg")
+									.attr("width", width + margin.left + margin.right)
+									.attr("height", height + margin.top + margin.bottom)
+									.append("g")
+									.attr("transform", "translate("+margin.left+","+margin.top + ")");
+
+						var symbol = d3.symbol();
+
+
+									var dots = svg.selectAll(".dots")
+										.data(data)
+										.enter()
+										.append("path");
+
+										var color = d3.scaleOrdinal()
+										.domain(["0", "1"])
+										.range(["red","blue"]);
+
+									dots.attr("d", symbol.type(function(d){if(d.IsGoodRating == 0){ return d3.symbolCircle} else if (d.IsGoodRating == 1){ return d3.symbolCross} }))
+										.attr('fill', "red")
+										.attr('stroke',function(d){ return color(d.IsGoodRating); })
+										.attr('stroke-width',0.9)
+										.attr('transform',function(d){ return "translate("+xScale(d.Rating)+","+yScale(d.WinsNoms)+")"; })
+
+										.attr("fill", "white");
+
+
+
+						//x axis
+						svg.append("g")
+							.attr("class", "x axis")
+							.attr("transform", "translate(0," + (height- padding) + ")")
+							.call(xAxis);
+
+
+						//y axis
+						svg.append("g")
+							.attr("class", "y axis")
+							.attr("transform", "translate(" + padding + ", 0)")
+							.call(yAxis);
+
+							svg.append('text')
+							.attr('x', 110)
+							.attr('y', 50)
+							.attr('class', 'label')
+							.attr("transform", "translate("+ (padding/4) +","+(height/2)+")rotate(-90)")
+							.text('Wins+Noms');
+
+							svg.append('text')
+							.attr('x', 650)
+							.attr('y', 440)
+							.attr('class', 'label')
+							.text('Rating');
+
+							svg.append("text")
+							.attr("x", width / 2 )
+							.attr("y", 20)
+							.style("text-anchor", "middle")
+							.text(" Wins+Nominations (log-scaled) vs. Rating")
+
+
+							var legend = svg.selectAll(".legend")
+									.data(color.domain())
+									.enter().append("g")
+									.attr("class", "legend")
+									.attr("transform", function(d, i){return "translate(0," + i * 30 + ")";});
+
+							legend.append("text")
+									.attr("x", width+40)
+									.attr("y", 0)
+									.attr("dy", ".35em")
+									.attr("font-size", "15px")
+									.style("text-anchor", "end")
+									.text(function(d) {
+											if(d=="1")
+													return "good rating";
+											else return "bad rating";
+									});
+
+							legend.append("path")
+											.attr("d",symbol.type(function(d){if(d == 0){ return d3.symbolCircle} else if (d == 1){ return d3.symbolCross} }))
+											.attr("transform", "translate("+(width-38)+", 0)")
+											.style("stroke", color)
+											.style("fill","white");
+
+
+
+
+//.attr("transform", "translate(0," + (height - margin.bottom) + ")")
+
+
+
+
+
+
+
+
+
+
+
+
+		});
+		</script>
+	</body>
+</html>
